@@ -47,7 +47,7 @@ By help of these tools, third party developers like data scientists and biomedic
 Structure of the SPONGE-Web project. A MySQL database contains all data of the different cancer types, with information about the genes, miRNAs and the ceRNA network. The API (immplemented with the Flask framework) controls the database and sends requests and accepts the answer. The API processes the data and sends it to the frontend (third party user like a R or Python package or website). At the website several visualization tools are provided. The database and the API represent the backend and the website, third party user represent the frontend.
 
 ## How to start requests?
-To start with further analysis with SPONGE data, it is important to get an overview about the available datasets/disease_types and the number of ceRNA interactions.
+To start with further analysis with SPONGE data, it is important to get an overview about the available disease_types and the number of ceRNA interactions. This can be retrieved with:
 
 <img src="https://raw.githubusercontent.com/biomedbigdata/SPONGE-web-R/master/vignettes/geneCounts.png" alt="Structure SPONGE-Web project" style="width: 500px; display: block; margin-left: auto; margin-right: auto;"/>
 
@@ -55,13 +55,13 @@ To start with further analysis with SPONGE data, it is important to get an overv
 get_datasetInformation()
 ```
 
-To retrieve all used parameters of the SPONGE method to re-create published results for the cancer type/dataset of interest, use the following function.
+To retrieve all used parameters of the SPONGE method to re-create published results for the cancer type of interest, use the following function:
 
 ```{r eval=FALSE}
 get_runInformation(disease_name = "kidney clear cell carcinoma")
 ```
 
-Another way to get an overview of the results is to search for a specific gene and get and idea in which ceRNA interaction network the gene of interest contributes most to.
+Another way to get an overview of the results is to search for a specific gene and get an idea in which ceRNA interaction network the gene of interest contributes most to.
 
 ```{r eval=FALSE}
 get_geneCount(gene_symbol = c("HOXA1"))
@@ -84,15 +84,13 @@ ggplot(geneCounts.m, aes(run.dataset.disease_name, value)) +
      labs(y= "counts", x = "disease name")
 ```
 
-## How to find a su bnetwork?
-To find a su bnetwork of nodes of interest use the functions:
-Get all ceRNA interactions by given identifications (ensg_number, gene_symbol or gene_type), specific cancer type/dataset or different filter possibilities according different statistical values (e.g. FDR adjusted p-value).
+## How to find a subnetwork?
+To find a sub network of nodes of interest use the functions: Get all ceRNA interactions by given identifications (ensg_number, gene_symbol or gene_type), specific cancer type or different filter possibilities according different statistical values (e.g. FDR adjusted p-value).
 ```{r eval=FALSE}
 # Retrieve all possible ceRNAs for gene, identified by ensg_number,
 # and threshold for pValue and mscor.
-get_all_ceRNAInteractions(ensg_number=c("ENSG00000259090","ENSG00000217289"),
-                          pValue=0.5, pValueDirection="<",
-                          mscor=0.006, mscorDirection="<",
+get_all_ceRNAInteractions(disease_name = "pancancer", ensg_number=c("ENSG00000259090","ENSG00000217289"),
+                          pValue=0.05, pValueDirection="<",
                           limit=15, information=FALSE)
 ```
 
@@ -100,20 +98,20 @@ Get all ceRNAs in a disease of interest (search not for a specific ceRNA, but se
 
 ```{r eval=FALSE}
 get_ceRNA(disease_name = "kidney clear cell carcinoma",
-          gene_type = "lincRNA", minBetweenness = 1500)
+          gene_type = "lincRNA", minBetweenness = 0.8)
 ```
 
 Get all interactions between the given identifiers (ensg_number or gene_symbol).
 
 ```{r eval=FALSE}
-get_specific_ceRNAInteractions(disease_name = "kidney clear cell carcinoma",
-                                ensg_number = c("ENSG00000259090","ENSG00000217289","ENSG00000152284"))
+get_specific_ceRNAInteractions(disease_name = "pancancer",
+                                gene_symbol = c("PTENP1","VCAN","FN1")
 ```
 
 ## How to find sponged miRNA?
 Find sponged miRNAs (the reason for a edge between two ceRNAs) with
 ```{r eval=FALSE}
-get_sponged_miRNA(disease_name="kidney", gene_symbol = c("TCF7L1", "SEMA4B"))
+get_sponged_miRNA(disease_name="kidney", gene_symbol = c("TCF7L1", "SEMA4B"), between=True)
 ```
 
 or find a miRNA induced ceRNA interaction with
@@ -130,10 +128,10 @@ The database also contains information about the raw expression values and survi
 To retrieve expression data use 
 
 ```{r eval=FALSE}
-# Retrieve gene expression values for specif genes by ensg_numbers
+# Retrieve gene expression values for specific genes by ensg_numbers
 get_geneExprValues(disease_name = "kidney clear cell carcinoma",
                    ensg_number = c("ENSG00000259090","ENSG00000217289"))
-# Retrieve gene expression values for specif miRNAs by mimat_numbers
+# Retrieve gene expression values for specific miRNAs by mimat_numbers
 get_mirnaExprValues(disease_name = "kidney clear cell carcinoma",
                     mimat_number = c("MIMAT0000076", "MIMAT0000261"))
 ```
@@ -146,7 +144,7 @@ get_survAna_rates(disease_name="kidney clear cell carcinoma",
                  sample_ID = c("TCGA-BP-4968","TCGA-B8-A54F"))
 ```
 
-It returs a data_frame with gene and patient/sample information and the "group information" encoded by column "overexpressed". Information about expression value of the gene (FALSE = underexpression, gene expression <= mean gene expression over all samples, TRUE = overexpression, gene expression >= mean gene expression over all samples)
+It returns a data_frame with gene and patient/sample information and the "group information" encoded by column "overexpressed". Information about expression value of the gene (FALSE = underexpression, gene expression <= mean gene expression over all samples, TRUE = overexpression, gene expression >= mean gene expression over all samples)
 
 For further patient/sample information:
 ```{r eval=FALSE}
@@ -160,8 +158,7 @@ sessionInfo()
 ```
 
 ## Citation
-## Citation
 If you use any results from spongeWeb, please cite as follow:
-```{r}
-Pachl, E., Hoffmann, M., Stiegler, V., Hartung, M., Schulz, M. H., List, M., SPONGE-web: A pan-cancer resource for competing endogenous RNA interactions (manuscript in preparation)
+```{r eval=FALSE}
+Pachl E., Hoffmann M., Hartung M., Stiegler V., Baumbach J., Schulz M., List M., SPONGE-web: A pan-cancer resource for competing endogenous RNA interactions (manuscript in preparation)
 ```
